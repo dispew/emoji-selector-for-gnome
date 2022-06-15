@@ -41,7 +41,7 @@ const _ = Gettext.gettext;
 
 // Retrocompatibility
 const ShellVersion = imports.misc.config.PACKAGE_VERSION;
-var useActors = parseInt(ShellVersion.split('.')[1]) < 33;
+var useActors = (parseInt(ShellVersion.split('.')[0]) == 3 && parseInt(ShellVersion.split('.')[1]) < 33);
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -75,14 +75,16 @@ var GLOBAL_BUTTON;
 var recents = [];
 
 // These global variables are used to store some static settings
-var NB_COLS;
-let POSITION;
+var NB_COLS = 10;
+let POSITION = 'bottom';
 
 //------------------------------------------------------------------------------
 
 function updateStyle() {
 	recents.forEach(function(b){
-		b.style = b.getStyle();
+		let fontStyle = 'font-size: ' + SETTINGS.get_int('emojisize') + 'px;';
+		fontStyle += ' color: #FFFFFF;';
+		b.style = fontStyle;
 	});
 	GLOBAL_BUTTON.emojiCategories.forEach(function(c){
 		c.emojiButtons.forEach(function(b){
@@ -110,6 +112,7 @@ function buildRecents() { //XXX not O.O.P.
 			// It will be a penguin for obvious reasons.
 			recents[i].super_btn.label = '🐧';
 		}
+		recents[i].super_btn.style = 'font-size: ' + SETTINGS.get_int('emojisize') + 'px; color: #FFFFFF;';
 	}
 }
 
@@ -206,6 +209,24 @@ class EmojiSearchItem {
 		}
 		return results;
 	}
+
+	shiftFor(currentEmoji) {
+		if (currentEmoji == '') { return; }
+		let temp = SETTINGS.get_strv('recently-used');
+		for(let i = 0; i < temp.length; i++) {
+			if (temp[i] == currentEmoji) {
+				temp.splice(i, 1);
+			}
+		}
+		for(let j = temp.length; j > 0; j--) {
+			temp[j] = temp[j-1];
+		}
+		temp[0] = currentEmoji;
+		SETTINGS.set_strv('recently-used', temp);
+		buildRecents();
+		saveRecents();
+		GLOBAL_BUTTON._onSearchTextChanged();
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -223,9 +244,9 @@ class EmojisMenu {
 			style_class: 'system-status-icon emotes-icon'
 		});
 		box.add_child(icon);
-		if (this._shellVersion < 40) {
-			box.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
-		}
+		//if (this._shellVersion < 40) {
+		//	box.add_child(PopupMenu.arrowIcon(St.Side.BOTTOM));
+		//}
 		this._permanentItems = 0;
 		this._activeCat = -1;
 
@@ -244,7 +265,7 @@ class EmojisMenu {
 		this._renderPanelMenuHeaderBox();
 
 		//creating the search entry
-		this.searchItem = new EmojiSearchItem();
+		this.searchItem = new EmojiSearchItem(NB_COLS);
 
 		//initializing the "recently used" buttons
 		let recentlyUsed = this._recentlyUsedInit();
@@ -256,11 +277,12 @@ class EmojisMenu {
 			this._permanentItems++;
 			this.super_btn.menu.addMenuItem(recentlyUsed);
 			this._permanentItems++;
+			this._addAllCategories();
 		}
 		//----------------------------------------------------------------------
-		this._addAllCategories();
 		//----------------------------------------------------------------------
 		if (POSITION === 'bottom') {
+			this._addAllCategories();
 			this.super_btn.menu.addMenuItem(recentlyUsed);
 			this._permanentItems++;
 			this.super_btn.menu.addMenuItem(this.searchItem.super_item);
@@ -328,7 +350,7 @@ class EmojisMenu {
 
 		/* creating new categories, with emojis not loaded yet */
 		for (let i = 0; i < 9; i++) {
-			this.emojiCategories[i] = new EmojiCategory(CAT_LABELS[i], CAT_ICONS[i], i);
+			this.emojiCategories[i] = new EmojiCategory(CAT_LABELS[i], CAT_ICONS[i], i, NB_COLS);
 		}
 	}
 
@@ -442,6 +464,7 @@ function init() {
 function enable() {
 	SETTINGS = ExtensionUtils.getSettings();
 	POSITION = SETTINGS.get_string('position');
+	NB_COLS = SETTINGS.get_int('nbcols');
 
 	// This variable is assigned here because init() wouldn't have provided
 	// gettext yet if it was done at the top level of the file.

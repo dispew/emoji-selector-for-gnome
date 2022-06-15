@@ -38,6 +38,7 @@ var EmojiCategory = class EmojiCategory {
 		this.super_item.actor.visible = false;
 		this.super_item.actor.reactive = false;
 		this.super_item._triangleBin.visible = false;
+		this.super_item.style = 'font-size: 16px; color: #FFFFFF; background-color: #211f1f;'
 
 		this.emojiButtons = []; // used for searching, and for updating the size/style
 
@@ -178,6 +179,7 @@ var EmojiCategory = class EmojiCategory {
 		let ln, container;
 		for (let i = 0; i < this.emojiButtons.length; i++) {
 			// lines of emojis
+			log(container);
 			if (i % this._nbColumns === 0) {
 				ln = new PopupMenu.PopupBaseMenuItem({
 					style_class: 'EmojisList',

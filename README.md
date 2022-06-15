@@ -38,6 +38,7 @@ Various contributions to the code itself:
 - [Ryan Gonzalez](https://github.com/kirbyfan64)
 - [amivaleo](https://github.com/amivaleo)
 - [xurizaemon](https://github.com/xurizaemon)
+- [dispew](https://github.com/dispew)
 
 The extension is currently available in the following languages:
 

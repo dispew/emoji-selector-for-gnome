@@ -46,7 +46,7 @@
 	height: 20px;
 	width: 20px;
 	border-style: solid;
-	border-color: black;
+	border-color: #555555;
 }
 
 .EmojisGender:hover, .EmojisGender:focus, .EmojisGender:active, .EmojisGender:checked,
@@ -59,6 +59,7 @@
 .EmojisGender:active, .EmojisGender:checked,
 .EmojisTone:active, .EmojisTone:checked {
 	border-radius: 6px;
+	border-color: #FFFFFF;
 }
 
 

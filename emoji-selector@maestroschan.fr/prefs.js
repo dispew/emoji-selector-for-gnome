@@ -46,6 +46,7 @@ const EmojiSelectorSettingsWidget = new GObject.Class({
 		positionCombobox.active_id = SETTINGS.get_string('position');
 
 		positionCombobox.connect("changed", (widget) => {
+			log(`Position Changed: ${widget.get_active_id()}`);
 			SETTINGS.set_string('position', widget.get_active_id());
 		});
 
